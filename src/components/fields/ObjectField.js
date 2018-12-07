@@ -93,6 +93,17 @@ class ObjectField extends Component {
     };
   };
 
+  onDropIndexClick = index => {
+    return event => {
+      if (event) {
+        event.preventDefault();
+      }
+      const { onChange, formData } = this.props;
+      delete formData[index];
+      onChange(formData);
+    };
+  };
+
   getAvailableKey = (preferredKey, formData) => {
     var index = 0;
     var newKey = preferredKey;
@@ -104,13 +115,19 @@ class ObjectField extends Component {
 
   onKeyChange = oldValue => {
     return (value, errorSchema) => {
+      function renameKeys(obj, newKeys) {
+        const keyValues = Object.keys(obj).map(key => {
+          const newKey = newKeys[key] || key;
+          return { [newKey]: obj[key] };
+        });
+        return Object.assign({}, ...keyValues);
+      }
+
       value = this.getAvailableKey(value, this.props.formData);
       const newFormData = { ...this.props.formData };
-      const property = newFormData[oldValue];
-      delete newFormData[oldValue];
-      newFormData[value] = property;
+      const renamedObj = renameKeys(newFormData, { [oldValue]: value });
       this.props.onChange(
-        newFormData,
+        renamedObj,
         errorSchema &&
           this.props.errorSchema && {
             ...this.props.errorSchema,
@@ -213,6 +230,7 @@ class ObjectField extends Component {
               registry={registry}
               disabled={disabled}
               readonly={readonly}
+              onDropIndexClick={this.onDropIndexClick}
             />
           ),
           name,

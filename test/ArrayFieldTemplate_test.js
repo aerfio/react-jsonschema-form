@@ -52,7 +52,6 @@ describe("ArrayFieldTemplate", () => {
           formData,
           ArrayFieldTemplate,
         });
-
         expect(node.querySelectorAll(".field-array div")).to.have.length.of(3);
       });
     });
